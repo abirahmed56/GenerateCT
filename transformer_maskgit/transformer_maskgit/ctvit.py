@@ -231,14 +231,14 @@ class CTViT(nn.Module):
         *,
         dim,
         codebook_size,
-        image_size,
-        patch_size,
+        image_size=64,
+        patch_size=16,
         temporal_patch_size,
         spatial_depth,
         temporal_depth,
         discr_base_dim = 16,
-        dim_head = 64,
-        heads = 8,
+        dim_head = 8,
+        heads = 4,
         channels = 1,
         use_vgg_and_gan = True,
         vgg = None,
@@ -329,7 +329,7 @@ class CTViT(nn.Module):
         # gan related losses
 
         self.discr = Discriminator(
-            image_size = 128,
+            image_size = 64,
             dim = discr_base_dim,
             channels = channels,
             attn_res_layers = discr_attn_res_layers
