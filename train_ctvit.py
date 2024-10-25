@@ -2,9 +2,9 @@ import torch
 from transformer_maskgit import CTViT, CTViTTrainer
 
 cvivit = CTViT(
-    dim = 64,
+    dim = 512,
     codebook_size = 1024,
-    image_size = 64,
+    image_size = 128,
     patch_size = 16,
     temporal_patch_size = 2,
     spatial_depth = 4,

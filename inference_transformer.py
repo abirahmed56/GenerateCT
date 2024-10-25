@@ -37,17 +37,16 @@ def scan_folder(directory):
 def infer():
     # set up distributed training
 
-
     ctvit = CTViT(
-    dim = 64,
-    codebook_size = 1024,
-    image_size = 64,
-    patch_size = 16,
-    temporal_patch_size = 2,
-    spatial_depth = 4,
-    temporal_depth = 4,
-    dim_head = 8,
-    heads = 4
+        dim = 512,
+        codebook_size = 1024,
+        image_size = 128,
+        patch_size = 16,
+        temporal_patch_size = 2,
+        spatial_depth = 4,
+        temporal_depth = 4,
+        dim_head = 8,
+        heads = 4
     )
 
     ctvit.eval()
@@ -58,9 +57,9 @@ def infer():
     ctvit.load(pretrained_ctvit_path)
 
     maskgit = MaskGit(
-        num_tokens=1024,
+        num_tokens=8192,
         max_seq_len=10000,
-        dim=64,
+        dim=512,
         dim_context=768,
         depth=2,
     )

@@ -2,17 +2,16 @@ import torch
 from transformer_maskgit import CTViT 
 from transformer_maskgit.ctvit_inference import CTVIT_inf
 
-
 ctvit = CTViT(
-dim = 64,
-codebook_size = 1024,
-image_size = 64,
-patch_size = 16,
-temporal_patch_size = 2,
-spatial_depth = 4,
-temporal_depth = 4,
-dim_head = 8,
-heads = 4
+    dim = 512,
+    codebook_size = 1024,
+    image_size = 128,
+    patch_size = 16,
+    temporal_patch_size = 2,
+    spatial_depth = 4,
+    temporal_depth = 4,
+    dim_head = 8,
+    heads = 4
 )
 ctvit.load('pretrained_models/ctvit_pretrained.pt')
 

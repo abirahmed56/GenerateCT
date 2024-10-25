@@ -18,9 +18,9 @@ def train():
     # set up distributed training
 
     ctvit = CTViT(
-        dim = 64,
+        dim = 512,
         codebook_size = 1024,
-        image_size = 64,
+        image_size = 128,
         patch_size = 16,
         temporal_patch_size = 2,
         spatial_depth = 4,
@@ -38,7 +38,7 @@ def train():
     maskgit = MaskGit(
         num_tokens=1024,
         max_seq_len=10000,
-        dim=64,
+        dim=512,
         dim_context=768,
         depth=2,
     )
