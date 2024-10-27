@@ -45,18 +45,12 @@ def convert_image_to_fn(img_type, image):
 
 # image related helpers fnuctions and dataset
 class ImageDataset(Dataset):
-    def __init__(
-        self,
-        folder,
-        image_size,
-        exts=['jpg', 'jpeg', 'png', 'nii.gz']
-    ):
+    def __init__(self, folder, image_size, exts=['jpg', 'jpeg', 'png', 'nii.gz']):
         super().__init__()
         self.folder = folder
-        self.image_size = image_size
+        self.image_size = image_size  # This should remain as an int
         self.paths = []
-        
-        # Collect all file paths with specified extensions
+
         for ext in exts:
             for p in Path(folder).rglob(f'*.{ext}'):
                 if p.is_file():
@@ -64,14 +58,14 @@ class ImageDataset(Dataset):
         
         print(f'{len(self.paths)} training samples found at {folder}')
 
-        # Define transformation pipeline for 2D images and slices from 3D images
         self.transform = T.Compose([
             T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
-            T.Resize((image_size, image_size)),  # Ensures all images are resized to the same dimensions
+            T.Resize((image_size, image_size)),  # Ensure it's a tuple
             T.RandomHorizontalFlip(),
             T.CenterCrop(image_size),
             T.ToTensor()
         ])
+
     
     def __len__(self):
         return len(self.paths)
