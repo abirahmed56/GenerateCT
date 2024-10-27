@@ -55,39 +55,50 @@ class ImageDataset(Dataset):
         self.folder = folder
         self.image_size = image_size
         self.paths = []
+        
+        # Collect all file paths with specified extensions
         for ext in exts:
-            for p in Path(f'{folder}').rglob(f'*.{ext}'):
+            for p in Path(folder).rglob(f'*.{ext}'):
                 if p.is_file():
                     self.paths.append(p)
         
         print(f'{len(self.paths)} training samples found at {folder}')
 
+        # Define transformation pipeline for 2D images and slices from 3D images
         self.transform = T.Compose([
             T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
-            T.Resize(image_size),
+            T.Resize((image_size, image_size)),  # Ensures all images are resized to the same dimensions
             T.RandomHorizontalFlip(),
             T.CenterCrop(image_size),
             T.ToTensor()
         ])
     
     def __len__(self):
-        print(self.paths)
         return len(self.paths)
 
-    def nii_to_tensor(self, path, transform):
+    def nii_to_tensor(self, path):
         nii_img = nib.load(str(path))
         img_data = nii_img.get_fdata()
-        slices = [transform(Image.fromarray(img_data[:, :, i], mode='F')) for i in range(img_data.shape[2])]
+        
+        # Normalize and resize each slice
+        img_data = (img_data / 1000).astype('float32')  # Normalizing
+        slices = [
+            self.transform(Image.fromarray(img_data[:, :, i], mode='F')) 
+            for i in range(img_data.shape[2])
+        ]
+        
+        # Stack slices and take mean, or modify to suit your specific needs
         tensor = torch.stack(slices, dim=0)
-        return tensor.mean(dim=0)  # or select a specific slice as needed
+        return tensor.mean(dim=0)  # Adjust as per your requirement, e.g., taking the mean slice or middle slice
 
     def __getitem__(self, index):
         path = self.paths[index]
-        if path.suffix == '.gz':
-            img = self.nii_to_tensor(path, self.transform)
+        if path.suffix == '.gz':  # Checks for .nii.gz files
+            img = self.nii_to_tensor(path)
         else:
             img = Image.open(path)
             img = self.transform(img)
+        
         return img
 
 
