@@ -69,6 +69,10 @@ class ImageDataset(Dataset):
             T.CenterCrop(image_size),
             T.ToTensor()
         ])
+    
+    def __len__(self):
+        print(self.paths)
+        return len(self.paths)
 
     def nii_to_tensor(self, path, transform):
         nii_img = nib.load(str(path))
