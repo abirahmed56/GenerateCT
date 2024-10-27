@@ -44,23 +44,22 @@ def convert_image_to_fn(img_type, image):
     return image
 
 # image related helpers fnuctions and dataset
-
 class ImageDataset(Dataset):
     def __init__(
         self,
         folder,
         image_size,
-        exts = ['jpg', 'jpeg', 'png', 'nii.gz']
+        exts=['jpg', 'jpeg', 'png', 'nii.gz']
     ):
         super().__init__()
         self.folder = folder
         self.image_size = image_size
         self.paths = []
-
+        for ext in exts:
+            for p in Path(f'{folder}').rglob(f'*.{ext}'):
+                if p.is_file():
+                    self.paths.append(p)
         
-
-        self.paths = [p for ext in exts for p in Path(f'{folder}').glob(f'**/*.{ext}')]
-
         print(f'{len(self.paths)} training samples found at {folder}')
 
         self.transform = T.Compose([
@@ -71,13 +70,56 @@ class ImageDataset(Dataset):
             T.ToTensor()
         ])
 
-    def __len__(self):
-        return len(self.paths)
+    def nii_to_tensor(self, path, transform):
+        nii_img = nib.load(str(path))
+        img_data = nii_img.get_fdata()
+        slices = [transform(Image.fromarray(img_data[:, :, i], mode='F')) for i in range(img_data.shape[2])]
+        tensor = torch.stack(slices, dim=0)
+        return tensor.mean(dim=0)  # or select a specific slice as needed
 
     def __getitem__(self, index):
         path = self.paths[index]
-        img = Image.open(path)
-        return self.transform(img)
+        if path.suffix == '.gz':
+            img = self.nii_to_tensor(path, self.transform)
+        else:
+            img = Image.open(path)
+            img = self.transform(img)
+        return img
+
+
+# class ImageDataset(Dataset):
+#     def __init__(
+#         self,
+#         folder,
+#         image_size,
+#         exts = ['jpg', 'jpeg', 'png']
+#     ):
+#         super().__init__()
+#         self.folder = folder
+#         self.image_size = image_size
+#         self.paths = []
+
+        
+
+#         self.paths = [p for ext in exts for p in Path(f'{folder}').glob(f'**/*.{ext}')]
+
+#         print(f'{len(self.paths)} training samples found at {folder}')
+
+#         self.transform = T.Compose([
+#             T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
+#             T.Resize(image_size),
+#             T.RandomHorizontalFlip(),
+#             T.CenterCrop(image_size),
+#             T.ToTensor()
+#         ])
+
+#     def __len__(self):
+#         return len(self.paths)
+
+#     def __getitem__(self, index):
+#         path = self.paths[index]
+#         img = Image.open(path)
+#         return self.transform(img)
 
 # tensor of shape (channels, frames, height, width) -> gif
 
