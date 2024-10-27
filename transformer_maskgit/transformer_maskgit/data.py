@@ -44,118 +44,40 @@ def convert_image_to_fn(img_type, image):
     return image
 
 # image related helpers fnuctions and dataset
-import os
-import json
-from pathlib import Path
-import numpy as np
-import nibabel as nib
-import torch
-from torch.utils.data import Dataset
-from PIL import Image
-import torchvision.transforms as T
-import torch.nn.functional as F
-from functools import partial
 
 class ImageDataset(Dataset):
     def __init__(
         self,
         folder,
         image_size,
-        channels=1,  # Assuming grayscale for medical images
-        exts=['nii.gz']
+        exts = ['jpg', 'jpeg', 'png']
     ):
         super().__init__()
         self.folder = folder
         self.image_size = image_size
-        self.channels = channels
         self.paths = []
-        self.number_of_slices = []
 
-        # Collect NIfTI files
-        for ext in exts:
-            for p in Path(folder).rglob(f'*.{ext}'):
-                if p.is_file():
-                    self.paths.append(p)
-                    # Store the number of slices for each file
-                    self.number_of_slices.append(nib.load(p).dataobj.shape[2])
+        
 
-        # Define the transformation pipeline
+        self.paths = [p for ext in exts for p in Path(f'{folder}').glob(f'**/*.{ext}')]
+
+        print(f'{len(self.paths)} training samples found at {folder}')
+
         self.transform = T.Compose([
-            T.Resize(image_size),  # Resize to the desired size
-            T.ToTensor(),          # Convert to tensor
+            T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
+            T.Resize(image_size),
+            T.RandomHorizontalFlip(),
+            T.CenterCrop(image_size),
+            T.ToTensor()
         ])
-
-    def nii_img_to_tensor(self, path, transform):
-        nii_img = nib.load(str(path))
-        img_data = nii_img.get_fdata()
-
-        # Load metadata for rescaling
-        path_json = str(path).replace(".nii.gz", "") + "_metadata.json"
-        with open(path_json, 'r') as f:
-            json_data = json.load(f)
-            slope = float(json_data["RescaleSlope"])
-            intercept = float(json_data["RescaleIntercept"])
-
-        img_data = slope * img_data + intercept
-        img_data = np.clip(img_data, -1000, 1000)  # Clip to Hounsfield Units
-        img_data = (img_data / 1000).astype(np.float32)  # Normalize
-
-        slices = []
-        for i in range(img_data.shape[2]):  # Iterate through slices
-            img_slice = img_data[:, :, i]  # Extract 2D slice
-            img_transformed = transform(Image.fromarray(img_slice, mode='F'))  # Apply transformations
-            slices.append(img_transformed)
-
-        # Stack slices into a tensor
-        tensor = torch.stack(slices, dim=0)  # Shape: (num_slices, channels, height, width)
-        return tensor
-
-    def __getitem__(self, index):
-        path = self.paths[index]
-        tensor = self.nii_img_to_tensor(path, self.transform)
-        return tensor
 
     def __len__(self):
         return len(self.paths)
 
-    def get_n_slices_list(self):
-        return self.number_of_slices
-
-
-
-# class ImageDataset(Dataset):
-#     def __init__(
-#         self,
-#         folder,
-#         image_size,
-#         exts = ['jpg', 'jpeg', 'png']
-#     ):
-#         super().__init__()
-#         self.folder = folder
-#         self.image_size = image_size
-#         self.paths = []
-
-        
-
-#         self.paths = [p for ext in exts for p in Path(f'{folder}').glob(f'**/*.{ext}')]
-
-#         print(f'{len(self.paths)} training samples found at {folder}')
-
-#         self.transform = T.Compose([
-#             T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
-#             T.Resize(image_size),
-#             T.RandomHorizontalFlip(),
-#             T.CenterCrop(image_size),
-#             T.ToTensor()
-#         ])
-
-#     def __len__(self):
-#         return len(self.paths)
-
-#     def __getitem__(self, index):
-#         path = self.paths[index]
-#         img = Image.open(path)
-#         return self.transform(img)
+    def __getitem__(self, index):
+        path = self.paths[index]
+        img = Image.open(path)
+        return self.transform(img)
 
 # tensor of shape (channels, frames, height, width) -> gif
 
