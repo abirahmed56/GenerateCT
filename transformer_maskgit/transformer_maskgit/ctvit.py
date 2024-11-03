@@ -509,10 +509,6 @@ class CTViT(nn.Module):
 
         b, c, f, *image_dims, device = *video.shape, video.device
         device=torch.device('cuda')
-        print("Image dims:")
-        print(tuple(image_dims))
-        print("Image size")
-        print(self.image_size)
         assert tuple(image_dims) == self.image_size
         assert not exists(mask) or mask.shape[-1] == f
         assert divisible_by(f - 1, self.temporal_patch_size), f'number of frames ({f}) minus one ({f - 1}) must be divisible by temporal patch size ({self.temporal_patch_size})'
