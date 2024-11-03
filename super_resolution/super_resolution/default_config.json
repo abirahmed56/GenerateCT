@@ -2,8 +2,8 @@
     "type": "original",
     "imagen": {
         "video": false,
-        "timesteps": [1024, 512, 512],
-        "image_sizes": [64, 256, 1024],
+        "timesteps": [1024, 64, 64],
+        "image_sizes": [32, 64, 256, 1024],
         "random_crop_sizes": [null, 64, 256],
         "condition_on_text": true,
         "cond_drop_prob": 0.1,
@@ -32,6 +32,14 @@
                 "layer_attns": false,
                 "layer_cross_attns": [false, false, false, true],
                 "attn_heads": 8
+            },
+            {
+                "dim": 64,
+                "dim_mults": [1, 2, 3, 4],
+                "num_resnet_blocks": 3,
+                "layer_attns": [false, true, true, true],
+                "layer_cross_attns": [false, true, true, true],
+                "attn_heads": 4
             }
         ]
     },
