@@ -289,7 +289,7 @@ class VideoDataset(Dataset):
                 slices.append(img_transformed)
         tensor = torch.stack(slices,dim=1)
         tensor = tensor.unsqueeze(1)
-        tensor=F.interpolate(tensor, size=(201, 128, 128), mode='trilinear',align_corners=False)
+        tensor=F.interpolate(tensor, size=(201, 64, 64), mode='trilinear',align_corners=False)
         tensor = tensor.squeeze(1)
         return tensor
 
