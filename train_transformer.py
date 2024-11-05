@@ -18,9 +18,9 @@ def train():
     # set up distributed training
 
     ctvit = CTViT(
-        dim = 512,
+        dim = 64,
         codebook_size = 1024,
-        image_size = 128,
+        image_size = 64,
         patch_size = 16,
         temporal_patch_size = 2,
         spatial_depth = 4,
@@ -38,7 +38,7 @@ def train():
     maskgit = MaskGit(
         num_tokens=1024,
         max_seq_len=10000,
-        dim=512,
+        dim=64,
         dim_context=768,
         depth=2,
     )
@@ -55,7 +55,7 @@ def train():
         transformer_model,
         num_train_steps=100000000,
         batch_size=1,
-        # pretrained_ctvit_path='pretrained_models/ctvit_pretrained.pt',
+        pretrained_ctvit_path='pretrained_models/ctvit_pretrained.pt',
         results_folder="transformer_train"
     )
 
