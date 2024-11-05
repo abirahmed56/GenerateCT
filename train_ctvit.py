@@ -16,7 +16,7 @@ cvivit = CTViT(
 trainer = CTViTTrainer(
     cvivit,
     folder = 'example_data/ctvit-transformer',
-    batch_size = 4,
+    batch_size = 1,
     results_folder="ctvit",
     grad_accum_every = 1,
     train_on_images = False,  # you can train on images first, before fine tuning on video, for sample efficiency
