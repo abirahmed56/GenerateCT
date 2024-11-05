@@ -97,7 +97,7 @@ class TransformerTrainer(nn.Module):
         *,
         num_train_steps,
         batch_size,
-        pretrained_ctvit_path,
+        # pretrained_ctvit_path,
         lr = 3e-5,
         wd = 0.,
         max_grad_norm = 0.5,

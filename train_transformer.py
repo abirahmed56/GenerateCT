@@ -55,7 +55,7 @@ def train():
         transformer_model,
         num_train_steps=100000000,
         batch_size=1,
-        pretrained_ctvit_path='pretrained_models/ctvit_pretrained.pt',
+        # pretrained_ctvit_path='pretrained_models/ctvit_pretrained.pt',
         results_folder="transformer_train"
     )
 
