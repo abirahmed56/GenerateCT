@@ -53,7 +53,8 @@ def train():
     # initialize DDP
     trainer = TransformerTrainer(
         transformer_model,
-        num_train_steps=100000000,
+        # num_train_steps=100000000,
+        num_train_steps=100,
         batch_size=1,
         pretrained_ctvit_path='pretrained_models/ctvit_pretrained.pt',
         results_folder="transformer_train"
