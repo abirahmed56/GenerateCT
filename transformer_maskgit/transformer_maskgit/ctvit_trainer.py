@@ -116,7 +116,7 @@ class CTViTTrainer(nn.Module):
         folder,
         train_on_images = False,
         num_frames = 17,
-        lr = 3e-5,
+        lr = 1e-5,
         grad_accum_every = 1,
         wd = 0.,
         max_grad_norm = 0.5,
