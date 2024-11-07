@@ -22,7 +22,7 @@ trainer = CTViTTrainer(
     train_on_images = False,  # you can train on images first, before fine tuning on video, for sample efficiency
     use_ema = False,          # recommended to be turned on (keeps exponential moving averaged cvivit) unless if you don't have enough resources
     # num_train_steps = 2000000,
-    num_train_steps = 200,
+    num_train_steps = 20,
     num_frames=2
 )
 
